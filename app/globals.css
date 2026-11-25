@@ -1,0 +1,253 @@
+@import "tailwindcss";
+
+:root {
+  --noko-bg: #000000;
+  --noko-fg: #f5f5f5;
+  --noko-card: #0a0a0a;
+  --noko-card-hover: #141414;
+  --noko-border: #232323;
+  --noko-muted: #a3a3a3;
+  --noko-faint: #6b6b6b;
+  --noko-accent: #ffffff;
+  --noko-accent-fg: #000000;
+  --noko-font: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --radius: 16px;
+}
+
+@theme inline {
+  --color-background: var(--noko-bg);
+  --color-foreground: var(--noko-fg);
+  --color-card: var(--noko-card);
+  --color-card-foreground: var(--noko-fg);
+  --color-muted: var(--noko-card-hover);
+  --color-muted-foreground: var(--noko-muted);
+  --color-primary: var(--noko-accent);
+  --color-primary-foreground: var(--noko-accent-fg);
+  --color-border: var(--noko-border);
+  --radius: var(--radius);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--noko-bg);
+  color: var(--noko-fg);
+  font-family: var(--noko-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.noko-app {
+  background-color: var(--noko-bg);
+  color: var(--noko-fg);
+  font-family: var(--noko-font);
+}
+
+.noko-card {
+  background-color: var(--noko-card);
+  border: 1px solid var(--noko-border);
+  border-radius: var(--radius);
+}
+
+.noko-card-hover:hover {
+  background-color: var(--noko-card-hover);
+}
+
+.noko-border {
+  border-color: var(--noko-border);
+}
+
+.noko-fg {
+  color: var(--noko-fg);
+}
+
+.noko-muted {
+  color: var(--noko-muted);
+}
+
+.noko-faint {
+  color: var(--noko-faint);
+}
+
+.noko-accent {
+  background-color: var(--noko-accent);
+  color: var(--noko-accent-fg);
+}
+
+.noko-accent-text {
+  color: var(--noko-accent);
+}
+
+.noko-accent-border {
+  border-color: var(--noko-accent);
+}
+
+.noko-input {
+  width: 100%;
+  background-color: var(--noko-bg);
+  border: 1px solid var(--noko-border);
+  color: var(--noko-fg);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.noko-input::placeholder {
+  color: var(--noko-faint);
+}
+
+.noko-input:focus {
+  border-color: var(--noko-accent);
+}
+
+.noko-chip {
+  border: 1px solid var(--noko-border);
+  color: var(--noko-muted);
+  border-radius: 9999px;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.noko-chip:hover {
+  background-color: var(--noko-card-hover);
+  color: var(--noko-fg);
+}
+
+.noko-chip-active {
+  background-color: var(--noko-accent);
+  color: var(--noko-accent-fg);
+  border-color: var(--noko-accent);
+}
+
+.noko-chip-active:hover {
+  background-color: var(--noko-accent);
+  color: var(--noko-accent-fg);
+}
+
+html[data-wallpaper="on"] .noko-card {
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+}
+
+html[data-wallpaper="on"] .noko-app {
+  background-color: transparent;
+}
+
+.noko-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.noko-wallpaper-blur {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+}
+
+.noko-wallpaper-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+.noko-mosaic {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* AI Bot eyes */
+@keyframes ai-blink {
+  0%,
+  86%,
+  100% {
+    transform: scaleY(1);
+  }
+  88% {
+    transform: scaleY(0.08);
+  }
+  90% {
+    transform: scaleY(1);
+  }
+  92% {
+    transform: scaleY(0.08);
+  }
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ai-glance {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(5px, -3px);
+  }
+  45% {
+    transform: translate(-4px, 2px);
+  }
+  70% {
+    transform: translate(3px, 4px);
+  }
+}
+
+.ai-eye {
+  animation: ai-blink 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.ai-glancer {
+  animation: ai-glance 9s ease-in-out infinite;
+}
+
+@keyframes ai-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.ai-breathe {
+  animation: ai-breathe 5.5s ease-in-out infinite;
+}
+
+@keyframes ai-wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.ai-wave-bar {
+  animation: ai-wave 1s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-eye,
+  .ai-glancer,
+  .ai-breathe,
+  .ai-wave-bar {
+    animation: none;
+  }
+}
