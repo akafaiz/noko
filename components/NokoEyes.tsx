@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 import type { EyeShape } from "@/lib/settings";
 
 export function eyeStyle(shape: EyeShape): CSSProperties {
-  if (shape === "rectangle") return { borderRadius: 14 };
   if (shape === "prism")
     return { clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)", borderRadius: 0 };
   return { borderRadius: 9999 };

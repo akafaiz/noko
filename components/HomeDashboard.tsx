@@ -4,28 +4,28 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Cloud, X, Sparkles } from "lucide-react";
+import { Calendar, Cloud, X, Sparkles, Settings, CreditCard } from "lucide-react";
+import { useT, type Lang } from "@/lib/i18n";
 import { useAuth } from "./AuthProvider";
 import { useWeather, describeWeather } from "@/lib/useWeather";
 import { useAppSettings } from "@/lib/settings";
 import { useEffectiveContrast } from "@/lib/useContrast";
-import { useT, type Lang } from "@/lib/i18n";
 import { iconFor } from "./WeatherWidget";
 import WeatherWidget from "./WeatherWidget";
 import MusicPlayer from "./MusicPlayer";
 import NokoEyes from "./NokoEyes";
 import Onboarding from "./Onboarding";
 import { useAlarmUI } from "./Alarms";
-import { isOnboardingPending, setOnboardingPending } from "@/lib/assistantData";
+import { isOnboardingPending, setOnboardingPending, setOnboarded, isOnboarded } from "@/lib/assistantData";
 import BrandLogoSticker from "./BrandLogoSticker";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const PILLS = [
-  { key: "assistant", href: "/hub" },
-  { key: "cashier", href: "/kasir" },
-  { key: "study", href: "/study" },
-  { key: "settings", href: "/settings" },
+const SIDE_MODES = [
+  { key: "assistant", href: "/hub", icon: Sparkles },
+  { key: "cashier", href: "/kasir", icon: CreditCard },
+  { key: "study", href: "/study", icon: Calendar },
+  { key: "settings", href: "/settings", icon: Settings },
 ];
 
 const SHORTCUTS = [
@@ -83,10 +83,11 @@ export default function HomeDashboard() {
   const happyTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    if (isOnboardingPending()) {
+    const isFirstTime = user && !isOnboarded();
+    if (isOnboardingPending() || isFirstTime) {
       queueMicrotask(() => setShowOnboarding(true));
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     queueMicrotask(() => setNow(new Date()));
@@ -170,7 +171,7 @@ export default function HomeDashboard() {
       : "—";
 
   return (
-    <div className="noko-app relative min-h-[100dvh] w-full overflow-y-auto md:overflow-hidden">
+    <div className="noko-app relative min-h-[100dvh] w-full max-w-full overflow-x-hidden overflow-y-auto md:overflow-hidden">
       <div className="absolute left-6 top-6">
         <p className="noko-faint text-[11px] uppercase tracking-[0.35em]">{t("appName")} HOME</p>
         <p className="noko-muted mt-1 text-sm">{date}</p>
@@ -190,7 +191,7 @@ export default function HomeDashboard() {
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.94 }}
-          className="absolute right-6 top-20"
+          className="relative z-50 pointer-events-auto absolute right-6 top-20"
         >
           <Link
             href="/login"
@@ -224,9 +225,22 @@ export default function HomeDashboard() {
             onClick={openMenu}
             aria-label="Noko"
             whileTap={{ scale: 0.96 }}
-            className="relative"
+            className="relative flex items-center"
           >
             <div
+              className="absolute right-full top-1/2 -translate-y-1/2 mr-4 w-max max-w-[180px] md:max-w-[220px] rounded-2xl px-4 py-2.5 text-sm font-medium text-white shadow-xl whitespace-nowrap overflow-hidden text-ellipsis"
+              style={{
+                background: "linear-gradient(135deg, var(--noko-accent) 0%, color-mix(in srgb, var(--noko-accent) 70%, black) 100%)",
+                color: "var(--noko-accent-fg)",
+              }}
+            >
+              {lang === "en" ? "Hi! I'm Nobo" : "Hi! Aku Nobo"}
+              <div
+                className="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-y-[8px] border-l-[12px] border-transparent"
+                style={{ borderLeftColor: "var(--noko-accent)" }}
+              />
+            </div>
+<div
               style={{
                 transform: `translate(${gaze.x}px, ${gaze.y}px)`,
                 transition: "transform .2s ease-out",
@@ -247,15 +261,7 @@ export default function HomeDashboard() {
             </div>
           </motion.button>
         </div>
-
-        <motion.button
-          onClick={openMenu}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.94 }}
-          className="noko-faint mt-14 text-xs uppercase tracking-[0.35em] transition-opacity hover:opacity-70"
-        >
-          {t("hiThere")}
-        </motion.button>
+        </div>
 
         <AnimatePresence>
           {showQuick && (
@@ -302,7 +308,6 @@ export default function HomeDashboard() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
 
       <div className="absolute bottom-6 left-6">
         <button
@@ -317,14 +322,22 @@ export default function HomeDashboard() {
         </p>
       </div>
 
-      <div className="absolute bottom-6 right-6 flex flex-wrap items-center justify-end gap-2">
-        {PILLS.map((p) => (
-          <motion.div key={p.href} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.94 }}>
-            <Link href={p.href} className="noko-chip block px-3.5 py-1.5 text-xs backdrop-blur">
-              {t(p.key)}
-            </Link>
-          </motion.div>
-        ))}
+      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-30 flex flex-col items-end gap-2 px-3 py-4 md:px-4 md:py-6">
+        {SIDE_MODES.map((p) => {
+          const Icon = p.icon;
+          return (
+            <motion.div key={p.href} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.94 }}>
+              <Link
+                href={p.href}
+                className="noko-chip group flex items-center gap-2 px-3 py-2 text-xs backdrop-blur transition-colors hover:bg-white/10"
+                aria-label={t(p.key)}
+              >
+                <Icon className="h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100" />
+                <span className="hidden sm:inline">{t(p.key)}</span>
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
 
       {detail && (
@@ -352,6 +365,7 @@ export default function HomeDashboard() {
           <Onboarding
             onClose={() => {
               setOnboardingPending(false);
+              setOnboarded(true);
               setShowOnboarding(false);
             }}
           />

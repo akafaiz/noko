@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-export type EyeShape = "pill" | "rectangle" | "prism";
+export type EyeShape = "pill" | "prism";
 export type ThemeMode = "dark" | "light";
 export type FontKey = "sans" | "mono" | "editorial";
 export type Lang = "id" | "en";

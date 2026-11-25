@@ -43,7 +43,7 @@ export default function HubShell() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="grid gap-4 lg:grid-cols-2 min-h-[100dvh] overflow-y-auto md:overflow-hidden p-4 md:p-0"
+      className="grid gap-4 lg:grid-cols-2 min-h-[100dvh] overflow-x-hidden overflow-y-auto md:overflow-hidden p-4 md:p-0 max-w-full"
     >
       <motion.div variants={item}>
         <AssistantChat />

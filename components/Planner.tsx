@@ -235,7 +235,7 @@ export default function Planner() {
               </button>
               <span
                 className={`noko-fg flex-1 text-sm ${
-                  task.done ? "line-through opacity-50" : ""
+                  task.done ? "line-through opacity-70" : ""
                 }`}
               >
                 {task.text}

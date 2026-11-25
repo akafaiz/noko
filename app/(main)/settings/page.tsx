@@ -45,7 +45,6 @@ const ACCENTS = [
 
 const EYES: { key: EyeShape; label: string; en: string }[] = [
   { key: "pill", label: "Pill", en: "Pill" },
-  { key: "rectangle", label: "Rectangle", en: "Rectangle" },
   { key: "prism", label: "Prism", en: "Prism" },
 ];
 
@@ -221,7 +220,7 @@ export default function SettingsPage() {
   const label = "noko-faint text-xs font-semibold uppercase tracking-[0.25em]";
 
   return (
-    <div className="mx-auto grid w-full max-w-3xl gap-4 min-h-[100dvh] overflow-y-auto md:overflow-hidden p-4 md:p-0">
+    <div className="mx-auto grid w-full max-w-3xl max-w-full gap-4 min-h-[100dvh] overflow-x-hidden overflow-y-auto md:overflow-hidden p-4 md:p-0">
       {/* Akun */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}

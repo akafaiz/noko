@@ -99,7 +99,7 @@ export default function PrayerTimes() {
                     active ? "noko-accent noko-accent-border" : "noko-border"
                   }`}
                 >
-                  <p className="text-[10px] uppercase opacity-70">{label(k)}</p>
+                  <p className="text-[10px] uppercase noko-fg">{label(k)}</p>
                   <p className="mt-0.5 text-xs font-semibold tabular-nums">
                     {timings[k] ?? "--:--"}
                   </p>

@@ -28,53 +28,13 @@ const ACTIONS: { key: Action; icon: React.ComponentType<{ className?: string }> 
   { key: "sumber", icon: Search },
 ];
 
-function splitSentences(t: string) {
-  return t
-    .split(/[\n.!?]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-function process(action: Action, material: string, topic: string) {
-  const text = material.trim();
-  const sents = splitSentences(text);
-  const base = topic.trim() || sents[0] || "materi";
-
-  if (action === "ringkas") {
-    const top = sents.slice(0, 4);
-    return top.length ? top.map((s, i) => `${i + 1}. ${s}`) : [text.slice(0, 240)];
-  }
-
-  if (action === "kuis") {
-    const lines = sents.slice(0, 3).map((s, i) => {
-      const words = s.split(/\s+/);
-      const idx = Math.min(words.length - 1, Math.floor(words.length / 2));
-      const answer = words[idx];
-      words[idx] = "____";
-      return `${i + 1}. ${words.join(" ")}\n   (jawaban: ${answer})`;
-    });
-    return lines.length ? lines : [text.slice(0, 240)];
-  }
-
-  if (action === "brainstorm") {
-    return [
-      `Apa 3 konsep kunci dari "${base}"?`,
-      `Bagaimana menerapkan "${base}" dalam kehidupan sehari-hari?`,
-      `Buat analogi sederhana untuk menjelaskan "${base}".`,
-      `Sumber/alat apa yang bisa memperdalam "${base}"?`,
-    ];
-  }
-
-  const queries = [base, `${base} penjelasan`, `${base} latihan soal`, `${base} pdf`];
-  return queries.map((q) => `${q} → https://www.google.com/search?q=${encodeURIComponent(q)}`);
-}
-
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export default function StudyShell() {
   const { t, lang } = useT();
   const [material, setMaterial] = useState("");
   const [topic, setTopic] = useState("");
+  const [extractUrl, setExtractUrl] = useState("");
   const [result, setResult] = useState<{ title: string; lines: string[] } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -82,6 +42,7 @@ export default function StudyShell() {
   const [seconds, setSeconds] = useState(25 * 60);
   const [running, setRunning] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [extracting, setExtracting] = useState(false);
 
   useEffect(() => {
     if (!running) return;
@@ -97,12 +58,62 @@ export default function StudyShell() {
     return () => clearInterval(id);
   }, [running]);
 
-  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+      setExtracting(true);
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const base64 = btoa(
+          String.fromCharCode(...new Uint8Array(arrayBuffer))
+        );
+        const res = await fetch("/api/extract", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileBase64: base64 }),
+        });
+        const data = await res.json();
+        if (data?.ok) {
+          setMaterial(data.text);
+          setTopic((t2) => t2 || file.name.replace(/\.pdf$/i, ""));
+        } else {
+          setResult({ title: t("resultNoko"), lines: [String(data?.error ?? t("chatError"))] });
+        }
+      } catch {
+        setResult({ title: t("resultNoko"), lines: [t("chatError")] });
+      } finally {
+        setExtracting(false);
+      }
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => setMaterial(String(reader.result ?? ""));
     reader.readAsText(file);
+  };
+
+  const onUrlExtract = async () => {
+    const url = extractUrl.trim();
+    if (!url) return;
+    setExtracting(true);
+    try {
+      const res = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (data?.ok) {
+        setMaterial(data.text);
+        setTopic((t2) => t2 || url);
+      } else {
+        setResult({ title: t("resultNoko"), lines: [String(data?.error ?? t("chatError"))] });
+      }
+    } catch {
+      setResult({ title: t("resultNoko"), lines: [t("chatError")] });
+    } finally {
+      setExtracting(false);
+    }
   };
 
   const run = async (a: Action) => {
@@ -111,7 +122,30 @@ export default function StudyShell() {
       return;
     }
     if (a === "sumber") {
-      setResult({ title: t("resultNoko"), lines: process(a, material, topic) });
+      if (!topic.trim() && !material.trim()) {
+        setResult({ title: t("resultNoko"), lines: [t("materialFirst")] });
+        return;
+      }
+      const langName = lang === "en" ? "English" : "Indonesia";
+      const sumberPrompt = `Saya sedang belajar topik berikut: "${topic.trim() || material.slice(0, 80)}". Berikan referensi pembelajaran yang terstruktur, kata kunci pencarian, subtopik yang bisa dieksplorasi, dan rekomendasi sumber belajar yang terpercaya, dalam bahasa ${langName}.\n\nMateri:\n${material}`;
+      setBusy(true);
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: sumberPrompt }),
+        });
+        const data = await res.json();
+        const lines = String(data?.reply ?? t("aiUnavailable"))
+          .split("\n")
+          .map((l) => l.trim())
+          .filter(Boolean);
+        setResult({ title: `${t("resultNoko")} · ${t("sumber")}`, lines });
+      } catch {
+        setResult({ title: t("resultNoko"), lines: [t("chatError")] });
+      } finally {
+        setBusy(false);
+      }
       return;
     }
     const langName = lang === "en" ? "English" : "Indonesia";
@@ -159,7 +193,7 @@ export default function StudyShell() {
   const ss = pad(seconds % 60);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2 min-h-[100dvh] overflow-y-auto md:overflow-hidden p-4 md:p-0">
+    <div className="grid gap-4 lg:grid-cols-2 min-h-[100dvh] overflow-x-hidden overflow-y-auto md:overflow-hidden p-4 md:p-0 max-w-full">
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -189,11 +223,34 @@ export default function StudyShell() {
           />
         </div>
 
+        <div className="mt-3">
+          <label className="noko-faint mb-1 block text-xs">{t("studyUrl")}</label>
+          <div className="flex items-center gap-2">
+            <input
+              value={extractUrl}
+              onChange={(e) => setExtractUrl(e.target.value)}
+              placeholder={t("studyUrlPlaceholder")}
+              className="noko-input flex-1 px-4 py-2.5 text-sm"
+            />
+            <motion.button
+              onClick={onUrlExtract}
+              disabled={extracting || !extractUrl.trim()}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.94 }}
+              className={`noko-accent rounded-xl px-4 py-2.5 text-sm font-semibold ${
+                extracting || !extractUrl.trim() ? "opacity-50" : ""
+              }`}
+            >
+              {extracting ? t("extracting") : t("extract")}
+            </motion.button>
+          </div>
+        </div>
+
         <div className="mt-3 flex items-center gap-2">
           <input
             ref={fileRef}
             type="file"
-            accept=".txt,.md,text/plain,text/markdown"
+            accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
             onChange={onFile}
             className="hidden"
           />
@@ -204,7 +261,7 @@ export default function StudyShell() {
             className="noko-chip flex items-center gap-2 px-4 py-2 text-xs"
           >
             <Upload className="h-4 w-4" />
-            {t("uploadTxt")}
+            {t("uploadTxtPdf")}
           </motion.button>
         </div>
 
@@ -222,7 +279,7 @@ export default function StudyShell() {
                   disabled={busy}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.94 }}
-                  className="noko-chip flex items-center gap-2 px-4 py-2 text-sm disabled:opacity-50"
+                  className="noko-chip flex items-center gap-2 px-4 py-2 text-sm disabled:opacity-70"
                 >
                   <Icon className="h-4 w-4" />
                   {t(a.key)}
@@ -242,7 +299,7 @@ export default function StudyShell() {
         <section className="noko-accent rounded-2xl p-6">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] opacity-60">
+             <p className="text-xs font-semibold uppercase tracking-[0.25em] opacity-90">
               {result?.title ?? t("resultNoko")}
             </p>
           </div>
@@ -253,7 +310,7 @@ export default function StudyShell() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="mt-3 text-sm opacity-60"
+                className="mt-3 text-sm opacity-90"
               >
                 {t("thinking")}
               </motion.p>
@@ -278,7 +335,7 @@ export default function StudyShell() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="mt-3 text-sm opacity-60"
+                className="mt-3 text-sm opacity-90"
               >
                 {t("resultEmpty")}
               </motion.p>

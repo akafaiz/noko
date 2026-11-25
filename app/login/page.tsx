@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Thermometer, Mail, Lock, User, Zap, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useT } from "@/lib/i18n";
-import { setOnboardingPending } from "@/lib/assistantData";
+import { setOnboardingPending, setOnboarded, isOnboarded } from "@/lib/assistantData";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,6 +37,7 @@ export default function LoginPage() {
       setError(res.error);
       return;
     }
+    const isFirstTime = !isOnboarded();
     if (mode === "signup") {
       // Supabase may require email confirmation; try signing in too.
       const login = await signIn(email, password);
@@ -44,7 +45,10 @@ export default function LoginPage() {
         setError(t("confirmEmail"));
         return;
       }
+    }
+    if (isFirstTime) {
       setOnboardingPending(true);
+      setOnboarded(false);
     }
     router.replace("/");
   };
@@ -65,7 +69,7 @@ export default function LoginPage() {
             <Thermometer className="h-8 w-8 text-primary-foreground" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">noko</h1>
-          <p className="text-sm text-muted-foreground">{t("loginSubtitle")}</p>
+          <p className="text-sm noko-fg">{t("loginSubtitle")}</p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xl">
@@ -145,7 +149,7 @@ export default function LoginPage() {
 
           <div className="my-4 flex items-center gap-3">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">{t("or")}</span>
+            <span className="text-xs noko-fg">{t("or")}</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
@@ -156,7 +160,7 @@ export default function LoginPage() {
             <Zap className="h-4 w-4" />
             {t("demoLogin")}
           </button>
-          <p className="mt-3 text-center text-xs text-muted-foreground">
+          <p className="mt-3 text-center text-xs noko-fg">
             {t("demoHint")}
           </p>
         </div>

@@ -48,6 +48,28 @@ const METHODS: { key: Method; icon: React.ComponentType<{ className?: string }> 
 const rupiah = (n: number) =>
   "Rp" + n.toLocaleString("id-ID", { maximumFractionDigits: 0 });
 
+const TX_STORAGE_KEY = "noko_transactions";
+
+function loadTxFromStorage(): Tx[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(TX_STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as Tx[];
+  } catch {
+    return [];
+  }
+}
+
+function saveTxToStorage(txs: Tx[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(TX_STORAGE_KEY, JSON.stringify(txs));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
 function QrPattern({ seed }: { seed: string }) {
   const cells = useMemo(() => {
     let s = 0;
@@ -85,7 +107,7 @@ export default function KasirPage() {
   const [modal, setModal] = useState(0);
   const [jual, setJual] = useState(0);
   const [method, setMethod] = useState<Method>("tunai");
-  const [history, setHistory] = useState<Tx[]>([]);
+  const [history, setHistory] = useState<Tx[]>(() => loadTxFromStorage());
   const [orderId, setOrderId] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
 
@@ -189,13 +211,41 @@ export default function KasirPage() {
       const data = await res.json();
       if (data?.ok) {
         setNote(t("noteSaved"));
-      } else if (String(data?.error ?? "").toLowerCase().includes("table")) {
-        setNote(t("noteNoTable"));
       } else {
-        setNote(`${t("noteFail")}: ${data?.error ?? "?"}`);
+        // Supabase not configured or table missing → fall back to localStorage.
+        const nextTx: Tx = {
+          id: Date.now(),
+          item,
+          qty,
+          modal,
+          jual,
+          total,
+          margin,
+          method,
+          date: new Date().toISOString(),
+        };
+        const all = [...history, nextTx];
+        setHistory(all);
+        saveTxToStorage(all);
+        setNote(t("noteSavedLocal"));
       }
     } catch {
-      setNote(t("noteConnFail"));
+      // Network failure → fall back to localStorage.
+      const nextTx: Tx = {
+        id: Date.now(),
+        item,
+        qty,
+        modal,
+        jual,
+        total,
+        margin,
+        method,
+        date: new Date().toISOString(),
+      };
+      const all = [...history, nextTx];
+      setHistory(all);
+      saveTxToStorage(all);
+      setNote(t("noteSavedLocal"));
     }
 
     if (method === "qris" && !qrisImage) {
@@ -258,7 +308,7 @@ export default function KasirPage() {
   };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2 min-h-[100dvh] overflow-y-auto md:overflow-hidden p-4 md:p-0">
+    <div className="grid gap-4 lg:grid-cols-2 min-h-[100dvh] overflow-x-hidden overflow-y-auto md:overflow-hidden p-4 md:p-0 max-w-full">
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}

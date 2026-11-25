@@ -36,8 +36,8 @@ export default function ModeShell({ children }: { children: ReactNode }) {
   const title = t(TITLES[pathname] ?? "appName");
 
   return (
-    <div className="noko-app flex h-screen w-full flex-col overflow-hidden">
-      <header className="flex shrink-0 items-center justify-between gap-3 px-6 py-4">
+    <div className="noko-app flex h-screen w-full max-w-full flex-col overflow-x-hidden overflow-hidden">
+      <header className="flex shrink-0 items-center justify-between gap-3 px-4 md:px-6 py-4">
         <div className="flex min-w-0 items-center gap-3">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.94 }}>
             <Link
@@ -80,8 +80,8 @@ export default function ModeShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div className="shrink-0 px-6">
-        <div className="grid grid-cols-3 gap-3">
+      <div className="shrink-0 px-4 md:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 min-w-0">
           {MODES.map((m) => {
             const active = pathname === m.href;
             return (
@@ -89,11 +89,11 @@ export default function ModeShell({ children }: { children: ReactNode }) {
                 key={m.href}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.96 }}
-                className="relative"
+                className="relative min-w-0"
               >
                 <Link
                   href={m.href}
-                  className={`noko-card relative block p-4 transition-colors ${
+                  className={`noko-card relative block p-4 transition-colors min-w-0 ${
                     active ? "noko-accent-border" : "hover:border-white/30"
                   }`}
                 >
@@ -105,9 +105,9 @@ export default function ModeShell({ children }: { children: ReactNode }) {
                       transition={SPRING}
                     />
                   )}
-                  <div className="relative">
+                  <div className="relative min-w-0">
                     <p
-                      className={`text-[10px] uppercase tracking-[0.25em] ${
+                      className={`text-[10px] uppercase tracking-[0.25em] truncate ${
                         active ? "" : "noko-faint"
                       }`}
                       style={active ? { color: "var(--noko-accent-fg)", opacity: 0.6 } : undefined}
@@ -115,7 +115,7 @@ export default function ModeShell({ children }: { children: ReactNode }) {
                       {t(m.label)}
                     </p>
                     <p
-                      className={`mt-1 text-lg font-semibold ${active ? "" : "noko-fg"}`}
+                      className={`mt-1 text-lg font-semibold truncate ${active ? "" : "noko-fg"}`}
                       style={active ? { color: "var(--noko-accent-fg)" } : undefined}
                     >
                       {t(m.sub)}
@@ -135,7 +135,7 @@ export default function ModeShell({ children }: { children: ReactNode }) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.985, y: -18 }}
           transition={{ duration: 0.45, ease: EASE }}
-          className="min-h-0 flex-1 overflow-auto px-6 py-6"
+          className="min-h-0 flex-1 overflow-auto px-4 md:px-6 py-6 max-w-full min-w-0"
         >
           {children}
         </motion.main>

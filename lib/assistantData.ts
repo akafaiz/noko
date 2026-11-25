@@ -129,6 +129,7 @@ export const getPin = pin.get;
 export const setPin = pin.set;
 
 const ONBOARD_KEY = "noko_onboarding_pending";
+const ONBOARDED_KEY = "noko_onboarded";
 
 export function setOnboardingPending(value: boolean) {
   try {
@@ -142,6 +143,23 @@ export function setOnboardingPending(value: boolean) {
 export function isOnboardingPending(): boolean {
   try {
     return window.localStorage.getItem(ONBOARD_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setOnboarded(value: boolean) {
+  try {
+    if (value) window.localStorage.setItem(ONBOARDED_KEY, "1");
+    else window.localStorage.removeItem(ONBOARDED_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function isOnboarded(): boolean {
+  try {
+    return window.localStorage.getItem(ONBOARDED_KEY) === "1";
   } catch {
     return false;
   }

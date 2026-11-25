@@ -328,7 +328,7 @@ export function AlarmPanel() {
               {a.enabled ? "✓" : ""}
             </button>
             <div className="min-w-0 flex-1">
-              <p className={`noko-fg text-sm ${a.enabled ? "" : "opacity-50"}`}>{a.label}</p>
+              <p className={`noko-fg text-sm ${a.enabled ? "" : "opacity-70"}`}>{a.label}</p>
               <p className="noko-faint text-[10px] uppercase tracking-wider">
                 {RINGTONES.find((r) => r.key === a.ringtone)?.label ?? a.ringtone}
               </p>
