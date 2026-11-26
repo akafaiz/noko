@@ -24,36 +24,41 @@ export default function QuickSearch() {
 
   return (
     <div className="noko-card p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <Globe className="noko-muted h-4 w-4" />
-        <h2 className="noko-faint text-xs font-semibold uppercase tracking-[0.25em]">
-          Quick Search / Pencarian Web
-        </h2>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Globe className="noko-muted h-4 w-4" />
+          <h2 className="noko-faint text-xs font-semibold uppercase tracking-[0.25em]">
+            Quick Search / Pencarian Web
+          </h2>
+        </div>
+        <div className="flex items-center gap-2">
+          {ENGINES.map((e) => (
+            <button
+              key={e.key}
+              onClick={() => setEngine(e.key)}
+              className={`w-auto shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                engine === e.key
+                  ? "bg-white text-black"
+                  : "noko-chip"
+              }`}
+            >
+              {e.label}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="flex gap-2">
+      <div className="w-full flex items-center gap-2 mt-3">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          placeholder="Ketik pencarian..."
-          className="noko-input flex-1 min-w-0 px-4 py-2.5 text-sm"
+          placeholder="Ketik kata kunci pencarian..."
+          className="flex-1 min-w-0 w-full px-4 py-3 rounded-full bg-zinc-900 border border-zinc-800 text-white"
         />
-        <select
-          value={engine}
-          onChange={(e) => setEngine(e.target.value)}
-          className="noko-input w-auto shrink-0 px-3 py-2.5 text-sm"
-        >
-          {ENGINES.map((e) => (
-            <option key={e.key} value={e.key}>
-              {e.label}
-            </option>
-          ))}
-        </select>
         <button
           onClick={handleSearch}
-          className="noko-accent flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold"
+          className="w-auto shrink-0 px-6 py-3 rounded-full bg-white text-black font-medium"
         >
-          <Search className="h-4 w-4" />
           Cari
         </button>
       </div>
