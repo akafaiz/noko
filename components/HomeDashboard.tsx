@@ -177,30 +177,30 @@ export default function HomeDashboard() {
         <p className="noko-muted mt-1 text-sm">{date}</p>
       </div>
 
-      <motion.button
-        onClick={() => setDetail(true)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.94 }}
-        className="noko-chip absolute right-6 top-6 flex items-center gap-2 px-3.5 py-1.5 text-sm backdrop-blur"
-      >
-        <wIcon.Icon className="h-4 w-4" />
-        {weatherText}
-      </motion.button>
-
-      {!user && (
-        <motion.div
+      <div className="absolute right-6 top-6 z-50 flex items-center gap-2">
+        {!user && (
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.94 }}
+          >
+            <Link
+              href="/login"
+              className="noko-accent block rounded-full px-4 py-2 text-xs font-semibold shadow-lg"
+            >
+              {t("loginRegister")}
+            </Link>
+          </motion.div>
+        )}
+        <motion.button
+          onClick={() => setDetail(true)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.94 }}
-          className="relative z-50 pointer-events-auto absolute right-6 top-20"
+          className="noko-chip flex items-center gap-2 px-3.5 py-1.5 text-sm backdrop-blur"
         >
-          <Link
-            href="/login"
-            className="noko-accent block rounded-full px-4 py-2 text-xs font-semibold shadow-lg"
-          >
-            {t("loginRegister")}
-          </Link>
-        </motion.div>
-      )}
+          <wIcon.Icon className="h-4 w-4" />
+          {weatherText}
+        </motion.button>
+      </div>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="relative flex items-center justify-center">
@@ -259,12 +259,11 @@ export default function HomeDashboard() {
                 </div>
               </div>
             </div>
-          </motion.button>
-        </div>
-        </div>
+</motion.button>
+      </div>
 
-        <AnimatePresence>
-          {showQuick && (
+      <AnimatePresence>
+        {showQuick && (
             <motion.div
               key="quick"
               initial={{ opacity: 0, height: 0, y: 10 }}
@@ -308,6 +307,7 @@ export default function HomeDashboard() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
 
       <div className="absolute bottom-6 left-6">
         <button
