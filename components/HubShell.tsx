@@ -6,6 +6,7 @@ import { LogOut, Zap } from "lucide-react";
 import WeatherWidget from "@/components/WeatherWidget";
 import MusicPlayer from "@/components/MusicPlayer";
 import AssistantChat from "@/components/AssistantChat";
+import QuickSearch from "@/components/QuickSearch";
 import Planner from "@/components/Planner";
 import PrayerTimes from "@/components/PrayerTimes";
 import SpiritualReminders from "@/components/SpiritualReminders";
@@ -47,6 +48,9 @@ export default function HubShell() {
     >
       <motion.div variants={item}>
         <AssistantChat />
+      </motion.div>
+      <motion.div variants={item}>
+        <QuickSearch />
       </motion.div>
 
       <motion.div variants={item} className="flex flex-col gap-4">
