@@ -1,0 +1,13 @@
+# NOKO HOME — PROJECT RULES
+1. **Design DNA:** Strict Nothing OS / Smart Display aesthetic. Default dark mode (`#000000` background, `#0A0A0A` cards, `1px solid #222222` borders), `rounded-3xl` for cards, `rounded-full` for pills/buttons. Never generate generic blue/purple gradients or decorative emojis in headings/buttons.
+2. **Strict Viewport & No Horizontal Overflow:** NEVER use `w-screen`. Always wrap pages in `w-full max-w-full overflow-x-hidden`. All buttons must use `w-auto shrink-0` unless explicitly inside a narrow form container.
+3. **Home Screen Structure:**
+   - Top Header (`w-full flex flex-wrap items-center justify-between`): Left = `NOKO HOME` + Date; Right = `Login / Daftar` pill + Weather pill.
+   - Center (`flex-1 flex flex-col items-center justify-center mx-auto`): Nobo Eyes (only `Pill` and `Prism` options; no `Rectangle`) with `"Hi! Aku Nobo"` speech bubble positioned cleanly to the LEFT of the eyes, and quick-action pills centered BELOW the eyes when clicked.
+   - Right Edge: Minimal vertical mode dock (`Assistant`, `Cashier`, `Study`, `Settings`).
+4. **Core Features to Preserve:**
+   - PIN-locked Personalization & Cashier Menu Editor (`localStorage` PIN + brand sticker opacity, size, uniform/individual mode, and locked drag state).
+   - Custom QRIS image upload in Cashier + Supabase `public.transactions` with `localStorage` fallback.
+   - Study Mode supporting URLs (`/api/extract`), PDF uploads, and AI actions (`Ringkas`, `Buat kuis`, `Brainstorm`, `Cari sumber`) via `/api/chat` (`OPENROUTER_API_KEY`).
+   - Bilingual support (`id` and `en`) with high-contrast text (`text-zinc-200`/`300` in dark mode, `text-zinc-800`/`900` in light mode).
+5. **Surgical Edits Only:** When fixing a bug or styling issue, only modify the specific component requested. Never rewrite unrelated pages or delete working features.
