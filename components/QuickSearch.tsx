@@ -36,7 +36,7 @@ export default function QuickSearch() {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           placeholder="Ketik pencarian..."
-          className="noko-input flex-1 px-4 py-2.5 text-sm"
+          className="noko-input flex-1 min-w-0 px-4 py-2.5 text-sm"
         />
         <select
           value={engine}
@@ -51,7 +51,7 @@ export default function QuickSearch() {
         </select>
         <button
           onClick={handleSearch}
-          className="noko-accent flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold"
+          className="noko-accent flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold"
         >
           <Search className="h-4 w-4" />
           Cari
