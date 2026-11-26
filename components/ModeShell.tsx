@@ -8,6 +8,7 @@ import { X, Sparkles } from "lucide-react";
 import { useAppSettings } from "@/lib/settings";
 import { useEffectiveContrast } from "@/lib/useContrast";
 import { useT } from "@/lib/i18n";
+import { useLayoutEdit } from "@/lib/layoutEdit";
 import NokoEyes from "./NokoEyes";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -32,6 +33,7 @@ export default function ModeShell({ children }: { children: ReactNode }) {
   const settings = useAppSettings();
   const effective = useEffectiveContrast(settings);
   const eyeColor = effective === "dark" ? "#ffffff" : "#111111";
+  const { editMode, setEditMode } = useLayoutEdit();
 
   const title = t(TITLES[pathname] ?? "appName");
 
@@ -63,6 +65,14 @@ export default function ModeShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <motion.button
+            onClick={() => setEditMode(!editMode)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.94 }}
+            className={`noko-chip px-3 py-1.5 text-xs backdrop-blur ${editMode ? "noko-chip-active" : ""}`}
+          >
+            {editMode ? "Selesai" : "Atur Layout"}
+          </motion.button>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.94 }}>
             <Link href="/settings" className="noko-chip px-3 py-1.5 text-xs backdrop-blur">
               {t("settings")}

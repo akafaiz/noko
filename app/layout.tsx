@@ -22,6 +22,8 @@ export const metadata: Metadata = {
     "Noko - smart display dengan Asisten AI, cuaca real-time, kasir QRIS, dan study mode bergaya Google Nest.",
 };
 
+import { LayoutEditProvider } from "../lib/layoutEdit";
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="id" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
@@ -29,7 +31,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeApplier />
         <AuthProvider>
           <AlarmProvider>
-            <SmoothScroll>{children}</SmoothScroll>
+            <LayoutEditProvider>
+              <SmoothScroll>{children}</SmoothScroll>
+            </LayoutEditProvider>
           </AlarmProvider>
         </AuthProvider>
       </body>
