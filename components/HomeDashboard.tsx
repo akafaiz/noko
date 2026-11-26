@@ -170,39 +170,40 @@ export default function HomeDashboard() {
       ? `${weather.temp}° ${weather.code != null ? describeWeather(weather.code, weather.isDay, lang).label : ""}`
       : "—";
 
-  return (
-    <div className="noko-app relative min-h-[100dvh] w-full max-w-full overflow-x-hidden overflow-y-auto md:overflow-hidden">
-      <div className="absolute left-6 top-6">
-        <p className="noko-faint text-[11px] uppercase tracking-[0.35em]">{t("appName")} HOME</p>
-        <p className="noko-muted mt-1 text-sm">{date}</p>
-      </div>
-
-      <div className="absolute right-6 top-6 z-50 flex items-center gap-2">
-        {!user && (
-          <motion.div
+return (
+    <div className="noko-app relative w-full max-w-full min-h-[100dvh] overflow-x-hidden flex flex-col justify-between p-4 md:p-8">
+      <div className="w-full flex flex-wrap items-center justify-between gap-3 z-40">
+        <div className="min-w-0">
+          <p className="noko-faint text-[11px] uppercase tracking-[0.35em]">{t("appName")} HOME</p>
+          <p className="noko-muted mt-1 text-sm">{date}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {!user && (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.94 }}
+            >
+              <Link
+                href="/login"
+                className="noko-accent block rounded-full px-4 py-2 text-xs font-semibold shadow-lg w-auto shrink-0"
+              >
+                {t("loginRegister")}
+              </Link>
+            </motion.div>
+          )}
+          <motion.button
+            onClick={() => setDetail(true)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.94 }}
+            className="noko-chip flex items-center gap-2 px-3.5 py-1.5 text-sm backdrop-blur w-auto shrink-0"
           >
-            <Link
-              href="/login"
-              className="noko-accent block rounded-full px-4 py-2 text-xs font-semibold shadow-lg"
-            >
-              {t("loginRegister")}
-            </Link>
-          </motion.div>
-        )}
-        <motion.button
-          onClick={() => setDetail(true)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.94 }}
-          className="noko-chip flex items-center gap-2 px-3.5 py-1.5 text-sm backdrop-blur"
-        >
-          <wIcon.Icon className="h-4 w-4" />
-          {weatherText}
-        </motion.button>
+            <wIcon.Icon className="h-4 w-4" />
+            {weatherText}
+          </motion.button>
+        </div>
       </div>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-full mx-auto">
         <div className="relative flex items-center justify-center">
           <div className="noko-border pointer-events-none absolute h-[340px] w-[340px] rounded-full border" />
 
@@ -240,7 +241,7 @@ export default function HomeDashboard() {
                 style={{ borderLeftColor: "var(--noko-accent)" }}
               />
             </div>
-<div
+            <div
               style={{
                 transform: `translate(${gaze.x}px, ${gaze.y}px)`,
                 transition: "transform .2s ease-out",
@@ -259,11 +260,11 @@ export default function HomeDashboard() {
                 </div>
               </div>
             </div>
-</motion.button>
-      </div>
+          </motion.button>
+        </div>
 
-      <AnimatePresence>
-        {showQuick && (
+        <AnimatePresence>
+          {showQuick && (
             <motion.div
               key="quick"
               initial={{ opacity: 0, height: 0, y: 10 }}
@@ -272,37 +273,33 @@ export default function HomeDashboard() {
               transition={{ duration: 0.35, ease: EASE }}
               className="overflow-hidden"
             >
-              <div className="mt-6 flex max-w-md flex-col items-center gap-3">
-                <div className="flex flex-wrap justify-center gap-2">
-                  {SHORTCUTS.map((s) => (
-                    <motion.div
-                      key={s.key + s.href}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.94 }}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-xl">
+                {SHORTCUTS.map((s) => (
+                  <motion.div
+                    key={s.key + s.href}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.94 }}
+                  >
+                    <Link
+                      href={s.href}
+                      className="noko-chip block px-3.5 py-1.5 text-xs backdrop-blur"
                     >
-                      <Link
-                        href={s.href}
-                        className="noko-chip block px-3.5 py-1.5 text-xs backdrop-blur"
-                      >
-                        {t(s.key)}
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {QUESTIONS.map((q) => (
-                    <motion.button
-                      key={q}
-                      onClick={() => askQuestion(q)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.94 }}
-                      className="noko-chip flex items-center gap-1 px-3.5 py-1.5 text-xs backdrop-blur"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" />
-                      {t(q)}
-                    </motion.button>
-                  ))}
-                </div>
+                      {t(s.key)}
+                    </Link>
+                  </motion.div>
+                ))}
+                {QUESTIONS.map((q) => (
+                  <motion.button
+                    key={q}
+                    onClick={() => askQuestion(q)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.94 }}
+                    className="noko-chip flex items-center gap-1 px-3.5 py-1.5 text-xs backdrop-blur"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    {t(q)}
+                  </motion.button>
+                ))}
               </div>
             </motion.div>
           )}

@@ -117,6 +117,7 @@ export default function KasirPage() {
   const [pinErr, setPinErr] = useState<string | null>(null);
 
   const [manage, setManage] = useState(false);
+  const [showQrisFull, setShowQrisFull] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pName, setPName] = useState("");
   const [pModal, setPModal] = useState(0);
@@ -532,11 +533,16 @@ export default function KasirPage() {
             </div>
             <div className="mt-4 flex flex-col items-center gap-3">
               {qrisImage ? (
-                <img
-                  src={qrisImage}
-                  alt="QRIS"
-                  className="noko-border max-h-64 w-auto rounded-xl border bg-white p-2 object-contain"
-                />
+                <div className="relative group cursor-zoom-in" onClick={() => setShowQrisFull(true)}>
+                  <img
+                    src={qrisImage}
+                    alt="QRIS"
+                    className="noko-border max-h-64 w-auto rounded-xl border bg-white p-2 object-contain transition-transform group-hover:scale-105"
+                  />
+                  <span className="absolute bottom-2 right-2 noko-chip flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold backdrop-blur bg-white/90 text-black shadow-md">
+                    Perbesar QRIS
+                  </span>
+                </div>
               ) : (
                 <QrPattern seed={orderId ?? String(total)} />
               )}
@@ -613,6 +619,39 @@ export default function KasirPage() {
           </div>
         </motion.section>
       </div>
+
+      {showQrisFull && qrisImage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6 backdrop-blur"
+          onClick={() => setShowQrisFull(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            className="relative rounded-3xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowQrisFull(false)}
+              className="absolute -top-3 -right-3 flex h-9 w-9 items-center justify-center rounded-full bg-black text-white shadow-lg hover:scale-110 transition-transform"
+              aria-label="Tutup"
+            >
+              ×
+            </button>
+            <img
+              src={qrisImage}
+              alt="QRIS Fullscreen"
+              className="max-h-[70vh] w-auto rounded-2xl object-contain"
+            />
+            <p className="mt-4 text-center text-lg font-bold text-black">{rupiah(total)}</p>
+          </motion.div>
+        </motion.div>
+      )}
 
       {showPin && (
         <motion.div
